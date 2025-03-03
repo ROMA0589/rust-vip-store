@@ -1,0 +1,38 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+.bg-game {
+  @apply fixed inset-0 w-full h-full;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+    url('/images/rust-background.jpg');  /* Cambiado a ruta pública */
+  background-size: cover; /* Cambiado de '80% auto' a 'cover' */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: -1;
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 768px) {
+  .bg-game {
+    background-size: 100% auto;
+    background-position: top center;
+    background-attachment: scroll; /* Solo cambiamos attachment en móvil */
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .bg-game {
+    background-attachment: scroll; /* Fix para iOS */
+  }
+}
+
+/* Estilos para asegurar que el contenido sea scrolleable */
+body {
+  @apply relative min-h-screen overflow-x-hidden bg-gray-900;
+}
+
+#root {
+  @apply relative z-10;
+}
