@@ -1,24 +1,19 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "zeroConfig": true }
+    }
+  ],
   "routes": [
     { "handle": "filesystem" },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    }
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
   "env": {
     "NEXT_PUBLIC_PAYPAL_CLIENT_ID": "AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS",
     "PAYPAL_CLIENT_SECRET": "EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL",
     "PAYPAL_MERCHANT_EMAIL": "slipknot19771989@gmail.com"
-  },
-  "build": {
-    "env": {
-      "NEXT_PUBLIC_PAYPAL_CLIENT_ID": "AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS",
-      "PAYPAL_CLIENT_SECRET": "EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL",
-      "PAYPAL_MERCHANT_EMAIL": "slipknot19771989@gmail.com"
-    }
   }
 }
