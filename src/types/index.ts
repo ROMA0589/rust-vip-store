@@ -6,3 +6,17 @@ export interface VipPackage {
   benefits: string[];
   image: string;
 }
+
+export interface CartItem extends VipPackage {
+  quantity: number;
+}
+
+export interface PayPalOrder {
+  id: string;
+  status: string;
+  links: Array<{
+    href: string;
+    rel: string;
+    method: string;
+  }>;
+}

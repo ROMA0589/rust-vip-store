@@ -2,6 +2,7 @@ import { VipCard } from './components/VipCard';
 import { CartProvider } from './context/CartContext';
 import { Cart } from './components/Cart';
 import { VipPackage } from './types';
+import { DiscordButton } from './components/DiscordButton';
 
 const vipPackages: VipPackage[] = [
   {
@@ -59,7 +60,7 @@ function App() {
               ))}
             </div>
           </div>
-          
+          <DiscordButton />
           {/* Footer */}
           <footer className="mt-8 sm:mt-12 py-4 sm:py-6 border-t border-gray-800 backdrop-blur-sm bg-black/20">
             <div className="max-w-7xl mx-auto px-4 text-center">

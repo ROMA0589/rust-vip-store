@@ -2,25 +2,40 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../context/CartContext';
+import { createPayPalOrder } from '../services/paymentService';
 
 export const Cart = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { items, removeFromCart, total } = useCart();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { items, removeFromCart, total, clearCart } = useCart();
 
   const toggleCart = () => setIsOpen(!isOpen);
 
   const handleCheckout = async () => {
     try {
-      const response = await fetch('/api/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items })
-      });
+      setError(null);
+      setIsProcessing(true);
+      const order = await createPayPalOrder(items);
+      
+      if (!order.links) {
+        throw new Error('No se recibió una respuesta válida de PayPal');
+      }
 
-      const data = await response.json();
-      window.location.href = data.paypalUrl;
-    } catch (error) {
-      console.error('Error al procesar el pago:', error);
+      const approveLink = order.links.find(
+        (link: any) => link.rel === 'approve'
+      );
+
+      if (!approveLink) {
+        throw new Error('No se encontró el link de pago');
+      }
+
+      window.location.href = approveLink.href;
+    } catch (error: any) {
+      setError(error.message || 'Error al procesar el pago');
+      console.error('Error en checkout:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -29,7 +44,8 @@ export const Cart = () => {
       {/* Botón del carrito - Ajustado para móviles */}
       <button
         onClick={toggleCart}
-        className="fixed top-2 right-2 z-50 bg-gray-800 p-2 sm:p-3 rounded-full shadow-lg hover:bg-gray-700 transition-colors"
+        className="fixed top-2 right-2 z-50 bg-gray-800/40 backdrop-blur-sm p-2 sm:p-3 rounded-full 
+          shadow-lg hover:bg-gray-700/50 transition-colors border border-white/10"
       >
         <div className="relative">
           <ShoppingCartIcon className="h-6 w-6 text-white" />
@@ -47,7 +63,7 @@ export const Cart = () => {
             {/* Overlay para cerrar el carrito */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
+              animate={{ opacity: 0.3 }}
               exit={{ opacity: 0 }}
               onClick={toggleCart}
               className="fixed inset-0 bg-black z-40"
@@ -59,7 +75,8 @@ export const Cart = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 20 }}
-              className="fixed right-0 top-0 h-screen w-full sm:w-80 bg-gray-800 p-4 sm:p-6 shadow-xl z-50"
+              className="fixed right-0 top-0 h-screen w-full sm:w-80 bg-gray-800/50 backdrop-blur-md 
+                p-4 sm:p-6 shadow-xl z-50 border-l border-white/10"
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold text-white">Carrito</h2>
@@ -89,16 +106,26 @@ export const Cart = () => {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-6 border-t border-gray-600 pt-4">
+                  <div className="mt-6 border-t border-white/10 pt-4">
                     <div className="flex justify-between text-white mb-4">
                       <span>Total:</span>
                       <span>${total.toFixed(2)}</span>
                     </div>
+                    {error && (
+                      <div className="text-red-500 text-sm mb-4">
+                        {error}
+                      </div>
+                    )}
                     <button
                       onClick={handleCheckout}
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded"
+                      disabled={isProcessing || items.length === 0}
+                      className={`w-full py-2 px-4 rounded transition-colors ${
+                        isProcessing || items.length === 0
+                          ? 'bg-gray-500 cursor-not-allowed'
+                          : 'bg-blue-500 hover:bg-blue-600'
+                      } text-white font-bold`}
                     >
-                      Pagar con PayPal
+                      {isProcessing ? 'Procesando...' : 'Pagar con PayPal'}
                     </button>
                   </div>
                 </>
