@@ -17,6 +17,13 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api/, '')
         }
       }
+    },
+    build: {
+      sourcemap: true,
+      minify: 'esbuild'
+    },
+    esbuild: {
+      jsxInject: `import React from 'react'`
     }
   }
 })
