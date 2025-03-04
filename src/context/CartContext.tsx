@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import type { ReactNode, FC } from 'react';
+import type { ReactNode } from 'react';
 import type { VipPackage } from '../types';
 
 interface CartItem extends VipPackage {
@@ -20,7 +20,7 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
-export const CartProvider: FC<CartProviderProps> = ({ children }) => {
+export function CartProvider({ children }: CartProviderProps) {
   const [items, setItems] = useState<CartItem[]>([]);
 
   const addToCart = (pack: VipPackage) => {
